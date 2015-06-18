@@ -29,7 +29,7 @@ with open(base_url+'facescrub_actors.txt', 'rb') as f:
             r = requests.get(url, stream=True)
             if r.status_code == 200:
                 full_path = '%s%s%s%s' % (image_url, 'actor_', row[2], '.jpg')
-                with open(full_path, 'r+b') as image_file:
+                with open(full_path, 'rb') as image_file:
                     for chunk in r.iter_content():
                         image_file.write(chunk)
 
