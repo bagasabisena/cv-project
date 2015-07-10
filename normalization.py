@@ -5,9 +5,11 @@ from scipy.ndimage import convolve
 from PIL import Image
 import utils
 
+
 def gamma_correction(im, gamma):
     return pow(im, gamma)
 
+# calculate 5x5 gaussian kernel
 def compute_kernel(sigma):
     gauss2d = multivariate_normal(mean=[0, 0], cov=[[pow(sigma, 2),0],
                                                    [0, pow(sigma, 2)]])
@@ -31,6 +33,7 @@ def dog(im, sigma1, sigma2):
 
     return gauss1-gauss2
 
+# two step contrast equalization to compensate for extreme illumination
 def contrast_equalization(im, alpha, tau):
 
     # first step
@@ -51,6 +54,8 @@ def contrast_equalization(im, alpha, tau):
     im = tau * np.tanh(im / tau)
     return im
 
+
+# the tan triggs normalization code
 def tan_triggs_norm(im, gamma, sigma1, sigma2, alpha, tau):
     im = gamma_correction(im, gamma)
     im = dog(im, sigma1, sigma2)

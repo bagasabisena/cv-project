@@ -13,6 +13,7 @@ import normalization
 from sklearn.decomposition import RandomizedPCA
 from sklearn.datasets import fetch_lfw_people
 
+# extract non uniform LBP feature for YALE dataset
 def lbp_feature():
 
     base_path = '../data/YALE/centered/'
@@ -41,6 +42,7 @@ def lbp_feature():
     np.save('../data/dataset/label.npy', labels)
 
 
+# extract uniform pattern LBP feature for YALE dataset
 def lbp_uni_feature(norm=True, filename='dataset.npy'):
     base_path = '../data/YALE/centered/'
     images = os.listdir(base_path)
@@ -75,7 +77,9 @@ def lbp_uni_feature(norm=True, filename='dataset.npy'):
     print 'saving data'
     np.save('../data/dataset/%s' % filename, data)
 
-def eigenface_feature():
+
+# extract eigenfaces for YALE dataset
+def eigenface_feature(n_components = 10, filename='lbp_pca.npy'):
     base_path = '../data/YALE/centered/'
     images = os.listdir(base_path)
     labels = np.empty(len(images))
@@ -97,17 +101,16 @@ def eigenface_feature():
         labels[i] = label
 
     # compute the pca
-    n_components = 10
     pca = RandomizedPCA(n_components=n_components, whiten=True).fit(data)
     eigenfaces = pca.components_.reshape((n_components, h, w))
     data_pca = pca.transform(data)
 
     print 'saving data'
-    np.save('../data/dataset/data_pca.npy', data_pca)
+    np.save('../data/dataset/%s' % filename, data_pca)
     np.save('../data/dataset/eigenfaces.npy', eigenfaces)
 
 
-
+# get label for YALE dataset
 def save_label():
     base_path = '../data/YALE/centered/'
     images = os.listdir(base_path)
@@ -120,11 +123,15 @@ def save_label():
     print 'saving data'
     np.save('../data/dataset/label.npy', labels)
 
+
+# extract uniform pattern LBP feature for LFW dataset
 def lfw_lbp(norm=True, filename='dataset.npy', min_people=20):
 
     # use helper from scikit-learn to prepare the LFW dataset
     print "prepare LFW image"
-    lfw_people = fetch_lfw_people(min_faces_per_person=min_people)
+    print "requires download ~200MB for the first time"
+    print "Next use will not download again"
+    lfw_people = fetch_lfw_people(data_home='../data/', min_faces_per_person=20)
     images = lfw_people.images
     label = lfw_people.target
 
@@ -155,6 +162,7 @@ def lfw_lbp(norm=True, filename='dataset.npy', min_people=20):
     np.save('../data/dataset/%s_label' % filename, label)
 
 
+# extract label for LFW
 def lfw_label(filename='lfw_label', min_people=20):
     print "prepare LFW label"
     lfw_people = fetch_lfw_people(min_faces_per_person=min_people)
@@ -162,10 +170,11 @@ def lfw_label(filename='lfw_label', min_people=20):
     np.save('../data/dataset/%s' % filename, label)
 
 
+# extract eigenfaces for LFW dataset
 def lfw_eigenface(filename='lfw_pca.npy', n_components=10, min_people=20):
     # use helper from scikit-learn to prepare the LFW dataset
     print "prepare LFW image"
-    lfw_people = fetch_lfw_people(min_faces_per_person=min_people)
+    lfw_people = fetch_lfw_people(data_home='../data/', min_faces_per_person=20)
     images = lfw_people.images
     h = 60
     w = 45
@@ -189,38 +198,8 @@ def lfw_eigenface(filename='lfw_pca.npy', n_components=10, min_people=20):
     np.save('../data/dataset/%s' % filename, data_pca)
     np.save('../data/dataset/%s_eigen' % filename, eigenfaces)
 
-# def lbp(im):
-#
-#     row = np.size(im, 0)
-#     col = np.size(im, 1)
-#
-#     lbp_im = np.array(im, copy=True)
-#
-#     for i in range(1,row-1):
-#         for j in range(1, col-1):
-#             pixel = im[i, j]
-#             neighbors = np.array([im[i,j-1], im[i-1, j-1], im[i-1,j],
-#                                   im[i-1, j+1], im[i, j+1], im[i+1, j+1],
-#                                   im[i+1, j], im[i+1, j-1]])
-#
-#             # compare neighbors with threshold
-#             binary = neighbors > pixel
-#
-#             # multiply with binary mask
-#             multiplies = pow(2, np.arange(8))
-#             multiplies = multiplies*binary
-#
-#             # populate the lbp array
-#             lbp_im[i, j] = sum(multiplies)
-#
-#     # create the histogram
-#     histogram = scipy.stats.itemfreq(np.ravel(lbp_im))
-#     print histogram[:, 1]
-#     print sum(histogram[:,1])
-#     norm_histogram = histogram[:, 1] / sum(histogram[:, 1])
-#     return norm_histogram
-    
 
 if __name__ == '__main__':
     #lfw_lbp(False, 'lfw_lbp_nonorm.npy', 20)
-    lfw_eigenface(n_components=150, min_people=20)
+    #lfw_lbp(True, 'lfw_lbp.npy', 20)
+    lfw_eigenface(n_components=100, min_people=20)

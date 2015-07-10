@@ -5,6 +5,7 @@ from PIL import Image
 import cv2
 import numpy as np
 
+
 def align_image(image, eye_left, eye_right, dest_size):
 
     offset = [0.3, 0.3]
@@ -44,6 +45,7 @@ def align_image(image, eye_left, eye_right, dest_size):
     cropped_image = cropped_image.resize(dest_size, Image.ANTIALIAS)
 
     return cropped_image
+
 
 def eye_detector(image):
 
